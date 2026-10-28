@@ -1,172 +1,345 @@
-# Talend ETL & Data Integration
+# HR Data Integration & Analytics | Talend ETL Pipeline
 
 ## Project Overview
 
-This project focuses on designing and implementing **ETL (Extract, Transform, Load) pipelines** using **Talend Open Studio, SQL, and MySQL**.
+This project focuses on designing and implementing an end-to-end **ETL (Extract, Transform, Load) pipeline** for Human Resources data using **Talend Open Studio, SQL, MySQL, and Power BI**.
 
-It demonstrates how data can be extracted from multiple sources, transformed according to business rules, and loaded into relational databases for analytics and reporting.
+The objective is to transform raw employee data into structured information that supports HR analytics and decision-making.
+
+The project uses the **IBM HR Analytics Employee Attrition & Performance Dataset** to analyze employee attrition, job satisfaction, workforce distribution, and HR performance indicators.
+
+The solution covers data extraction, cleaning, transformation, integration, data warehouse design, and visualization.
 
 ## Objectives
 
-- Automate data integration processes.
-- Extract data from CSV files and relational databases.
-- Transform and validate data.
-- Apply business rules.
-- Load processed data into MySQL.
-- Prepare datasets for business intelligence analysis.
+- Design and automate ETL pipelines for HR data.
+- Extract employee data from CSV files.
+- Clean and validate employee records.
+- Handle missing values, duplicates, and inconsistent data.
+- Apply HR business rules using Talend tMap.
+- Design a relational data warehouse using MySQL.
+- Automate data loading into MySQL.
+- Develop Power BI dashboards for HR analytics.
+- Analyze employee attrition and workforce trends.
+- Support data-driven HR decision-making.
 
 ## Technologies
 
 | Technology | Purpose |
 |------------|---------|
-| Talend Open Studio | ETL development and orchestration |
-| SQL | Data querying and manipulation |
-| MySQL / MariaDB | Database management |
+| Talend Open Studio | ETL development and data integration |
+| SQL | Data querying and transformation |
+| MySQL / MariaDB | Data warehouse and database management |
 | Java | Talend job execution |
-| Power BI | Data analysis and visualization |
-| Git & GitHub | Version control |
+| Power BI | HR dashboards and data visualization |
+| Git & GitHub | Version control and documentation |
 
-## Implemented ETL Workflows
+## Dataset
 
-### 1. Product and Sales Data Processing
+**Dataset:** IBM HR Analytics Employee Attrition & Performance
 
-Developed an ETL workflow to process product and sales information.
+**File:** `WA_Fn-UseC_-HR-Employee-Attrition.csv`
 
-Implemented transformations using **Talend tMap**, including:
+The dataset contains employee information related to demographics, job characteristics, compensation, satisfaction, and attrition.
 
-- Product classification into Premium and Standard categories.
-- Conditional business rules.
-- Data mapping and transformation.
-- Database loading.
+### Main Attributes
 
-**Business Rule Example:**
+| Attribute | Description |
+|-----------|-------------|
+| EmployeeNumber | Employee identifier |
+| Age | Employee age |
+| Department | Employee department |
+| JobRole | Employee job position |
+| MonthlyIncome | Monthly salary |
+| JobSatisfaction | Job satisfaction score |
+| WorkLifeBalance | Work-life balance score |
+| OverTime | Overtime status |
+| YearsAtCompany | Employee tenure |
+| TotalWorkingYears | Total professional experience |
+| Attrition | Employee attrition status |
+| PerformanceRating | Employee performance rating |
+
+## ETL Pipeline Development
+
+### 1. Data Extraction
+
+Extract HR data from CSV files using Talend.
+
+Planned operations:
+
+- Import the HR dataset.
+- Configure the input schema.
+- Verify column names and data types.
+- Inspect source records.
+- Prepare data for transformation.
+
+**Talend Components:**
+- tFileInputDelimited
+- tLogRow
+
+### 2. Data Cleaning and Validation
+
+Implement data quality rules to improve the reliability of HR information.
+
+Planned operations:
+
+- Detect missing values.
+- Identify duplicate employee records.
+- Validate employee identifiers.
+- Check salary and age values.
+- Standardize categorical attributes.
+- Verify data types.
+
+**Talend Components:**
+- tMap
+- tFilterRow
+- tUniqRow
+
+### 3. Data Transformation
+
+Apply business rules using Talend tMap.
+
+#### Employee Age Classification
 
 ```text
-IF (TotalAmount / Quantity >= 200)
-    THEN ProductCategory = "Premium"
+IF Age < 30
+    THEN "Young"
+ELSE IF Age < 45
+    THEN "Mid-Career"
 ELSE
-    ProductCategory = "Standard"
+    "Senior"
 ```
 
-### 2. Multi-Source Data Integration
+#### Employee Income Classification
 
-Developed an ETL pipeline integrating three CSV datasets.
+Example business rule:
 
-The workflow performs:
+```text
+IF MonthlyIncome < 3000
+    THEN "Low Income"
+ELSE IF MonthlyIncome < 8000
+    THEN "Medium Income"
+ELSE
+    "High Income"
+```
 
-- Data extraction from CSV files.
-- Dataset joins using tMap.
-- Data transformation.
-- Data loading into MySQL.
+#### Employee Tenure Classification
 
-**Output Dataset Structure:**
+```text
+IF YearsAtCompany < 3
+    THEN "New Employee"
+ELSE IF YearsAtCompany < 10
+    THEN "Experienced Employee"
+ELSE
+    "Long-Term Employee"
+```
+
+These classification thresholds are initial business rules and can be adjusted during data analysis.
+
+### 4. Data Warehouse Design
+
+Design a dimensional data model to support HR analytics.
+
+#### Proposed Star Schema
+
+**Fact Table: Fact_HR**
 
 | Column | Description |
 |--------|-------------|
-| ProductID | Product identifier |
-| CustomerID | Customer identifier |
-| Quantity | Quantity sold |
-| TotalPrice | Total transaction amount |
-| ProductName | Product name |
-| Price | Unit price |
-| CustomerName | Customer name |
-| Country | Customer country |
+| EmployeeKey | Employee reference |
+| DepartmentKey | Department reference |
+| JobKey | Job reference |
+| AttritionFlag | Employee attrition indicator |
+| MonthlyIncome | Employee monthly income |
+| JobSatisfaction | Job satisfaction score |
+| YearsAtCompany | Employee tenure |
 
-### 3. Database Integration
+**Dimension Tables:**
 
-Implemented database connections to automate the loading of transformed data into MySQL.
+- Dim_Employee
+- Dim_Department
+- Dim_Job
 
-- Configured database connections.
-- Implemented SQL operations.
-- Loaded transformed records.
-- Validated the resulting database records.
+The proposed schema will be refined during the data modeling phase.
+
+### 5. Data Loading
+
+Load transformed HR data into MySQL.
+
+Planned operations:
+
+- Create the data warehouse tables.
+- Configure MySQL connections.
+- Map source fields to target columns.
+- Load dimension tables.
+- Load the fact table.
+- Validate inserted records.
+
+**Talend Components:**
+- tDBConnection
+- tDBOutput
+- tDBCommit
 
 ## ETL Architecture
 
 ```text
-        CSV Files / Source Database
+          IBM HR Analytics Dataset
+                    |
+                    v
+              CSV Data Source
                     |
                     v
              Talend Open Studio
                     |
                     v
-             Data Extraction
+              Data Extraction
+           (tFileInputDelimited)
+                    |
+                    v
+          Data Quality Validation
+        (tFilterRow / tUniqRow)
                     |
                     v
            Data Transformation
-               (tMap)
+                  (tMap)
                     |
                     v
               Data Loading
+               (tDBOutput)
                     |
                     v
              MySQL Database
                     |
                     v
-          Business Intelligence
-               (Power BI)
+             HR Data Warehouse
+                    |
+                    v
+                 Power BI
+                    |
+                    v
+              HR Dashboards
+```
+
+## HR Analytics & KPIs
+
+The Power BI dashboards will focus on the following indicators.
+
+| KPI | Description |
+|-----|-------------|
+| Total Employees | Total number of employee records |
+| Attrition Rate | Percentage of employees who left |
+| Average Monthly Income | Average employee salary |
+| Average Job Satisfaction | Mean employee satisfaction score |
+| Overtime Rate | Percentage of employees working overtime |
+| Department Distribution | Employees by department |
+| Average Employee Tenure | Average years at the company |
+| Attrition by Department | Employee attrition across departments |
+| Attrition by Job Role | Employee attrition across job positions |
+| Attrition by Age Group | Employee attrition by age category |
+
+### Attrition Rate Formula
+
+```text
+Attrition Rate (%) =
+(Number of Employees with Attrition = Yes
+ / Total Number of Employees) * 100
 ```
 
 ## Project Structure
 
 ```text
-talend-etl-data-integration/
+hr-analytics-talend-etl/
 |
 |-- jobs/
-|   |-- TP3_ex1/
-|   |-- TP3_ex2/
+|   |-- data_extraction/
+|   |-- data_cleaning/
+|   |-- data_transformation/
+|   |-- data_loading/
 |
 |-- datasets/
-|   |-- products.csv
-|   |-- customers.csv
-|   |-- sales.csv
+|   |-- raw/
+|   |-- processed/
 |
 |-- sql/
-|   |-- create_tables.sql
-|   |-- queries.sql
+|   |-- create_database.sql
+|   |-- create_dimensions.sql
+|   |-- create_fact_table.sql
+|   |-- validation_queries.sql
+|
+|-- powerbi/
+|   |-- hr_analytics_dashboard.pbix
 |
 |-- screenshots/
 |   |-- talend-workflow.png
 |   |-- tmap-transformation.png
 |   |-- mysql-results.png
+|   |-- powerbi-dashboard.png
 |
 |-- docs/
 |   |-- etl-architecture.png
+|   |-- data-warehouse-schema.png
 |
 |-- README.md
 |-- .gitignore
 |-- LICENSE
 ```
 
-## Project Results
+This structure represents the target organization of the repository. Files will be added as development progresses.
 
-- Successfully implemented ETL workflows.
-- Applied conditional data transformations.
-- Integrated multiple datasets using tMap.
-- Automated data loading into MySQL.
-- Verified data integration results.
+## Project Status
+
+**Status: In Progress**
+
+### Development Roadmap
+
+- [ ] Dataset exploration and analysis
+- [ ] Data quality assessment
+- [ ] ETL extraction pipeline
+- [ ] Data cleaning and validation
+- [ ] Business rule implementation using tMap
+- [ ] MySQL data warehouse design
+- [ ] Data integration and loading
+- [ ] ETL testing and validation
+- [ ] Power BI dashboard development
+- [ ] Project documentation
 
 ## Screenshots
 
+Screenshots will be added as the project progresses.
+
 ### Talend ETL Workflow
 
-![Talend Workflow](screenshots/talend-workflow.png)
+<!-- Add Talend workflow screenshot here -->
 
 ### Data Transformation Using tMap
 
-![tMap Transformation](screenshots/tmap-transformation.png)
+<!-- Add tMap transformation screenshot here -->
 
-### MySQL Database Results
+### MySQL Data Warehouse
 
-![MySQL Results](screenshots/mysql-results.png)
+<!-- Add MySQL database screenshot here -->
+
+### Power BI HR Dashboard
+
+<!-- Add Power BI dashboard screenshot here -->
+
+## Expected Results
+
+- Automated ETL pipeline for HR data.
+- Improved data consistency through validation rules.
+- Structured MySQL data warehouse.
+- Integrated employee data for analytics.
+- HR dashboards displaying workforce indicators.
+- Analysis of employee attrition and job satisfaction.
 
 ## Future Improvements
 
-- Implement data quality checks.
-- Add automated error handling.
-- Introduce ETL pipeline monitoring.
-- Develop Power BI dashboards.
-- Improve pipeline performance.
+- Implement automated data quality monitoring.
+- Add ETL error handling and logging.
+- Introduce pipeline scheduling.
+- Improve ETL performance.
+- Integrate additional HR data sources.
+- Explore machine learning for employee attrition prediction.
 
 ## Author
 
